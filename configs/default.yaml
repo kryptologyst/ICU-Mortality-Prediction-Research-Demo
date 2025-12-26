@@ -1,0 +1,131 @@
+# Default configuration for ICU Mortality Prediction
+defaults:
+  - _self_
+
+# Data configuration
+data:
+  synthetic:
+    n_samples: 1000
+    n_features: 7
+    mortality_rate: 0.25
+    random_seed: 42
+  
+  preprocessing:
+    test_size: 0.2
+    val_size: 0.2
+    random_seed: 42
+    patient_level_split: true
+  
+  features:
+    categorical: ['gender']
+    numerical: ['age', 'sofa_score', 'glucose', 'heart_rate', 'systolic_bp', 'spo2']
+    target: 'mortality'
+
+# Model configuration
+model:
+  name: 'random_forest'  # Options: random_forest, xgboost, lightgbm, tabnet, ft_transformer
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    random_state: 42
+  
+  xgboost:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+  
+  lightgbm:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+  
+  tabnet:
+    n_d: 64
+    n_a: 64
+    n_steps: 5
+    gamma: 1.5
+    lambda_sparse: 1e-3
+    optimizer_params:
+      lr: 2e-2
+      weight_decay: 1e-5
+    scheduler_params:
+      step_size: 30
+      gamma: 0.1
+
+# Training configuration
+training:
+  batch_size: 32
+  epochs: 100
+  early_stopping_patience: 10
+  learning_rate: 0.001
+  weight_decay: 1e-4
+  device: 'auto'  # auto, cpu, cuda, mps
+  
+  # Loss function
+  loss:
+    name: 'bce'  # Options: bce, focal, weighted_bce
+    focal_alpha: 0.25
+    focal_gamma: 2.0
+    class_weights: [1.0, 3.0]  # [survived, deceased]
+
+# Evaluation configuration
+evaluation:
+  metrics:
+    - 'auroc'
+    - 'auprc'
+    - 'sensitivity'
+    - 'specificity'
+    - 'ppv'
+    - 'npv'
+    - 'f1'
+    - 'calibration_error'
+  
+  thresholds:
+    - 0.1
+    - 0.2
+    - 0.3
+    - 0.4
+    - 0.5
+    - 0.6
+    - 0.7
+    - 0.8
+    - 0.9
+
+# Explainability configuration
+explainability:
+  shap:
+    enabled: true
+    max_samples: 100
+    background_samples: 50
+  
+  lime:
+    enabled: true
+    max_samples: 100
+
+# Logging configuration
+logging:
+  level: 'INFO'
+  log_dir: 'logs'
+  log_every_n_steps: 10
+  save_checkpoints: true
+  checkpoint_dir: 'checkpoints'
+
+# Output configuration
+output:
+  results_dir: 'results'
+  plots_dir: 'assets/plots'
+  models_dir: 'models'
+  save_predictions: true
+  save_explanations: true
+
+# Reproducibility
+seed: 42
+deterministic: true
